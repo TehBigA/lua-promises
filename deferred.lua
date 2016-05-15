@@ -123,17 +123,20 @@ function M.new(options)
 	options = options or {}
 	local d
 	d = {
-		next = function(self, success, failure)
-			local next = M.new({success = success, failure = failure, extend = options.extend})
-			if d.state == RESOLVED then
-				next:resolve(d.value)
-			elseif d.state == REJECTED then
-				next:reject(d.value)
-			else
-				table.insert(d.queue, next)
-			end
-			return next
-		end,
+        next = function(self, success, failure)
+            local next = M.new({success = success, failure = failure, extend = options.extend})
+            if d.state == RESOLVED then
+                next:resolve(d.value)
+            elseif d.state == REJECTED then
+                next:reject(d.value)
+            else
+                table.insert(d.queue, next)
+            end
+            return next
+        end,
+        catch = function(self, failure)
+            return d:next(nil, failure)
+        end,
 		state = 0,
 		queue = {},
 		success = options.success,
